@@ -6,3 +6,5 @@ docs:
 
 imports:
   - dochub/root.yaml
+  - ceaf-core-original/_metamodel_/root.yaml
+
