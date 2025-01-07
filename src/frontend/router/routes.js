@@ -65,8 +65,13 @@ const middleware = (route) => {
 
     window.OidcUserManager.getUser().then(user => {
       if (user) {
-        // eslint-disable-next-line no-console
-        console.log(user.profile.roles);
+        if (process.env.NODE_ENV !== 'production') {
+          window.Vuex.commit('appendProblems', {
+            id: 'user-roles',
+            title: 'User Roles',
+            items: [{ description: JSON.stringify(user.profile.roles) }]
+          });
+        }
       }
     });
 
@@ -74,7 +79,13 @@ const middleware = (route) => {
 };
 
 const login = async function() {
-  console.log('window.Vuex',window.Vuex);
+  if (process.env.NODE_ENV !== 'production') {
+    window.Vuex.commit('appendProblems', {
+      id: 'vuex-state',
+      title: 'Vuex State',
+      items: [{ description: 'Login process started' }]
+    });
+  }
   await oidcClient.signinCallback();
 };
 

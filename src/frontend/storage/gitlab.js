@@ -163,8 +163,15 @@ export default {
             let rulesContext = null;
 
             storageManager.onReloaded = (parser) => {
-                // eslint-disable-next-line no-console
-                console.info('TIME OF RELOAD SOURCES = ', (Number.parseFloat((Date.now() - tickCounter) / 1000)).toFixed(4));
+                const reloadTime = (Number.parseFloat((Date.now() - tickCounter) / 1000)).toFixed(4);
+                if (process.env.NODE_ENV !== 'production') {
+                    window.Vuex.commit('appendProblems', {
+                        id: 'reload-time',
+                        title: 'Performance Metrics',
+                        items: [{ description: `Time of reload sources: ${reloadTime}s` }]
+                    });
+                }
+
                 // Очищаем прошлую загрузку
                 context.commit('clean');
                 // Регистрируем обнаруженные ошибки
@@ -188,16 +195,26 @@ export default {
                 rulesContext = rules(manifest,
                     (problems) => context.commit('appendProblems', problems),
                     (error) => {
-                        // eslint-disable-next-line no-console
-                        console.error(error);
-                        context.commit('appendProblems', error);
+                        window.Vuex.commit('appendProblems', {
+                            id: 'rules-error',
+                            title: 'Rules Error',
+                            items: [{ description: error.toString(), critical: true }]
+                        });
                     });
-                // eslint-disable-next-line no-console
-                console.info('TIME OF EXECUTE RULES = ', (Number.parseFloat((Date.now() - startRules) / 1000)).toFixed(4));
-                // eslint-disable-next-line no-console
-                console.info('TIME OF FULL RELOAD = ', (Number.parseFloat((Date.now() - tickCounter) / 1000)).toFixed(4));
-                // eslint-disable-next-line no-console
-                console.info('MEMORY STATUS ', window?.performance?.memory);
+
+                if (process.env.NODE_ENV !== 'production') {
+                    const rulesTime = (Number.parseFloat((Date.now() - startRules) / 1000)).toFixed(4);
+                    const fullReloadTime = (Number.parseFloat((Date.now() - tickCounter) / 1000)).toFixed(4);
+                    window.Vuex.commit('appendProblems', {
+                        id: 'performance-metrics',
+                        title: 'Performance Metrics',
+                        items: [
+                            { description: `Time of execute rules: ${rulesTime}s` },
+                            { description: `Time of full reload: ${fullReloadTime}s` },
+                            { description: `Memory status: ${JSON.stringify(window?.performance?.memory)}` }
+                        ]
+                    });
+                }
             };
 
             storageManager.onStartReload = () => {
@@ -363,10 +380,19 @@ export default {
 			gateway.appendListener('source/changed', reloadSourceAll);
 		},
     //парсим токен с ролями
-    setRolesFromToken(context){
-      console.log('ACTION.............');
-      context.commit('setAvailableRoles', {roles : {users: ['test']}});
-
+    setRolesFromToken(context) {
+      if (process.env.NODE_ENV !== 'production') {
+        window.Vuex.commit('appendProblems', {
+          id: 'roles-token',
+          title: 'Roles Token',
+          items: [{ description: 'Setting roles from token' }]
+        });
+      }
+      return window.OidcUserManager.getUser().then(user => {
+        if (user) {
+          context.commit('setRoles', user.profile.roles);
+        }
+      });
     },
 		// Вызывается при необходимости получить access_token
 		refreshAccessToken(context, OAuthCode) {
@@ -415,17 +441,14 @@ export default {
 
 		// Reload root manifest
 		async reloadRootManifest(_context, payload) {
-      console.log('reload root manifest');
-			// Если работаем в режиме backend, берем все оттуда
-			if (env.isBackendMode()) {
-				storageManager.onStartReload();
-				storageManager.onReloaded({
-					manifest: Object.freeze({}),
-					mergeMap: Object.freeze({})
-				});
-			} else {
-				await storageManager.reloadManifest(payload);
-			}
+      if (process.env.NODE_ENV !== 'production') {
+        window.Vuex.commit('appendProblems', {
+          id: 'reload-manifest',
+          title: 'Manifest Reload',
+          items: [{ description: 'Reloading root manifest' }]
+        });
+      }
+      await storageManager.reloadAll(payload);
 		},
 
         // Reload root manifest
