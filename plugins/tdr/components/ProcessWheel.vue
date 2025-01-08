@@ -1,42 +1,38 @@
 <template>
-  <div class="process-wheel" ref="wheel">
-    <svg :width="size" :height="size" @click="handleClick">
+  <div ref="wheel" class="process-wheel">
+    <svg v-bind:width="size" v-bind:height="size" v-on:click="handleClick">
       <!-- Центральный круг -->
       <circle
-        :cx="center"
-        :cy="center"
-        :r="innerRadius"
-        class="center-circle"
-      />
+        v-bind:cx="center"
+        v-bind:cy="center"
+        v-bind:r="innerRadius"
+        class="center-circle" />
       
       <!-- Центральный текст -->
       <text
-        :x="center"
-        :y="center"
+        v-bind:x="center"
+        v-bind:y="center"
         class="center-text"
         text-anchor="middle"
-        alignment-baseline="middle"
-      >
+        alignment-baseline="middle">
         {{ title }}
       </text>
 
       <!-- Секции -->
-      <g v-for="(section, index) in processedSections" :key="section.key">
+      <g v-for="(section, index) in processedSections" v-bind:key="section.key">
         <!-- Сектор -->
         <path
-          :d="section.path"
-          :class="['section', { active: section.key === activeSection }]"
-          @click="selectSection(section.key)"
-        />
+          v-bind:d="section.path"
+          v-bind:class="['section', { active: section.key === activeSection }]"
+          v-on:click="selectSection(section.key)" />
         
         <!-- Текст секции -->
         <text
-          :x="section.textX"
-          :y="section.textY"
-          :transform="section.textTransform"
+          v-bind:x="section.textX"
+          v-bind:y="section.textY"
+          v-bind:transform="section.textTransform"
           class="section-text"
-          text-anchor="middle"
-        >
+          text-anchor="middle">
           {{ section.title }}
         </text>
       </g>
@@ -44,25 +40,25 @@
       <!-- Линии связи -->
       <path
         v-for="(line, index) in connectionLines"
-        :key="'line-' + index"
-        :d="line"
-        class="connection-line"
-      />
+        v-bind:key="'line-' + index"
+        v-bind:d="line"
+        class="connection-line" />
     </svg>
 
     <!-- Детали активной секции -->
-    <div v-if="activeSection" class="section-details" :style="detailsStyle">
+    <div v-if="activeSection" class="section-details" v-bind:style="detailsStyle">
       <h3>{{ sections[activeSection].title }}</h3>
       <p class="description">{{ sections[activeSection].description }}</p>
       
-      <div v-for="(subsection, key) in sections[activeSection].subsections" 
-           :key="key" 
-           class="subsection"
-           v-if="key !== 'description'">
+      <div
+        v-for="(subsection, key) in sections[activeSection].subsections" 
+        v-if="key !== 'description'" 
+        v-bind:key="key"
+        class="subsection">
         <h4>{{ key }}</h4>
         <p v-if="subsection.description">{{ subsection.description }}</p>
         <ul v-if="subsection.items">
-          <li v-for="(item, i) in subsection.items" :key="i">{{ item }}</li>
+          <li v-for="(item, i) in subsection.items" v-bind:key="i">{{ item }}</li>
         </ul>
       </div>
     </div>
@@ -70,110 +66,119 @@
 </template>
 
 <script>
-export default {
-  name: 'ProcessWheel',
-  props: {
-    sections: {
-      type: Object,
-      required: true
+  export default {
+    name: 'ProcessWheel',
+    props: {
+      sections: {
+        type: Object,
+        required: true
+      },
+      title: {
+        type: String,
+        required: true
+      }
     },
-    title: {
-      type: String,
-      required: true
-    }
-  },
-  data() {
-    return {
-      size: 800,
-      innerRadius: 80,
-      outerRadius: 300,
-      activeSection: null,
-      detailsPosition: { x: 0, y: 0 }
-    };
-  },
-  computed: {
-    center() {
-      return this.size / 2;
-    },
-    processedSections() {
-      const sectionKeys = Object.keys(this.sections);
-      const angleStep = (2 * Math.PI) / sectionKeys.length;
-      
-      return sectionKeys.map((key, index) => {
-        const startAngle = index * angleStep;
-        const endAngle = (index + 1) * angleStep;
-        
-        // Вычисляем путь для сектора
-        const path = this.calculateSectorPath(startAngle, endAngle);
-        
-        // Вычисляем позицию для текста
-        const textRadius = (this.innerRadius + this.outerRadius) / 2;
-        const textAngle = startAngle + angleStep / 2;
-        const textX = this.center + textRadius * Math.cos(textAngle);
-        const textY = this.center + textRadius * Math.sin(textAngle);
-        
-        return {
-          key,
-          title: this.sections[key].title,
-          path,
-          textX,
-          textY,
-          textTransform: `rotate(${(textAngle * 180 / Math.PI)})`
-        };
-      });
-    },
-    connectionLines() {
-      // Генерируем линии связи между секциями
-      return this.processedSections.map((section, index) => {
-        const nextIndex = (index + 1) % this.processedSections.length;
-        const current = this.processedSections[index];
-        const next = this.processedSections[nextIndex];
-        
-        return `M ${current.textX} ${current.textY} Q ${this.center} ${this.center} ${next.textX} ${next.textY}`;
-      });
-    },
-    detailsStyle() {
+    data() {
       return {
-        position: 'absolute',
-        left: `${this.detailsPosition.x}px`,
-        top: `${this.detailsPosition.y}px`
+        size: 800,
+        innerRadius: 80,
+        outerRadius: 300,
+        activeSection: null,
+        detailsPosition: { x: 0, y: 0 }
       };
-    }
-  },
-  methods: {
-    calculateSectorPath(startAngle, endAngle) {
-      const x1 = this.center + this.innerRadius * Math.cos(startAngle);
-      const y1 = this.center + this.innerRadius * Math.sin(startAngle);
-      const x2 = this.center + this.outerRadius * Math.cos(startAngle);
-      const y2 = this.center + this.outerRadius * Math.sin(startAngle);
-      const x3 = this.center + this.outerRadius * Math.cos(endAngle);
-      const y3 = this.center + this.outerRadius * Math.sin(endAngle);
-      const x4 = this.center + this.innerRadius * Math.cos(endAngle);
-      const y4 = this.center + this.innerRadius * Math.sin(endAngle);
-
-      return `M ${x1} ${y1} L ${x2} ${y2} A ${this.outerRadius} ${this.outerRadius} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${this.innerRadius} ${this.innerRadius} 0 0 0 ${x1} ${y1}`;
     },
-    selectSection(key) {
-      this.activeSection = this.activeSection === key ? null : key;
+    computed: {
+      center() {
+        return this.size / 2;
+      },
+      processedSections() {
+        const sectionKeys = Object.keys(this.sections);
+        const angleStep = (2 * Math.PI) / sectionKeys.length;
       
-      // Вычисляем позицию для деталей
-      if (this.activeSection) {
-        const section = this.processedSections.find(s => s.key === key);
-        const rect = this.$refs.wheel.getBoundingClientRect();
-        this.detailsPosition = {
-          x: section.textX - rect.left,
-          y: section.textY - rect.top
+        return sectionKeys.map((key, index) => {
+          const startAngle = index * angleStep;
+          const endAngle = (index + 1) * angleStep;
+        
+          // Вычисляем путь для сектора
+          const path = this.calculateSectorPath(startAngle, endAngle);
+        
+          // Вычисляем позицию для текста
+          const textRadius = (this.innerRadius + this.outerRadius) / 2;
+          const textAngle = startAngle + angleStep / 2;
+          const textX = this.center + textRadius * Math.cos(textAngle);
+          const textY = this.center + textRadius * Math.sin(textAngle);
+        
+          return {
+            key,
+            title: this.sections[key].title,
+            path,
+            textX,
+            textY,
+            textTransform: `rotate(${(textAngle * 180 / Math.PI)})`
+          };
+        });
+      },
+      connectionLines() {
+        // Генерируем линии связи между секциями
+        return this.processedSections.map((section, index) => {
+          const nextIndex = (index + 1) % this.processedSections.length;
+          const current = this.processedSections[index];
+          const next = this.processedSections[nextIndex];
+        
+          return `M ${current.textX} ${current.textY} Q ${this.center} ${this.center} ${next.textX} ${next.textY}`;
+        });
+      },
+      detailsStyle() {
+        return {
+          position: 'absolute',
+          left: `${this.detailsPosition.x}px`,
+          top: `${this.detailsPosition.y}px`
         };
+      },
+      filteredItems() {
+        if (!this.sections[this.activeSection]?.subsections) return [];
+        return Object.entries(this.sections[this.activeSection].subsections)
+          .filter(([key]) => key !== 'description')
+          .map(([key, value]) => ({
+            key,
+            ...value
+          }));
       }
     },
-    handleClick(event) {
-      // Закрываем детали при клике вне секций
-      if (event.target.tagName === 'svg') {
-        this.activeSection = null;
+    methods: {
+      calculateSectorPath(startAngle, endAngle) {
+        const x1 = this.center + this.innerRadius * Math.cos(startAngle);
+        const y1 = this.center + this.innerRadius * Math.sin(startAngle);
+        const x2 = this.center + this.outerRadius * Math.cos(startAngle);
+        const y2 = this.center + this.outerRadius * Math.sin(startAngle);
+        const x3 = this.center + this.outerRadius * Math.cos(endAngle);
+        const y3 = this.center + this.outerRadius * Math.sin(endAngle);
+        const x4 = this.center + this.innerRadius * Math.cos(endAngle);
+        const y4 = this.center + this.innerRadius * Math.sin(endAngle);
+
+        return `M ${x1} ${y1} L ${x2} ${y2} A ${this.outerRadius} ${this.outerRadius} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${this.innerRadius} ${this.innerRadius} 0 0 0 ${x1} ${y1}`;
+      },
+      selectSection(key) {
+        this.activeSection = this.activeSection === key ? null : key;
+      
+        // Вычисляем позицию для деталей
+        if (this.activeSection) {
+          const section = this.processedSections.find(s => s.key === key);
+          const rect = this.$refs.wheel.getBoundingClientRect();
+          this.detailsPosition = {
+            x: section.textX - rect.left,
+            y: section.textY - rect.top
+          };
+        }
+      },
+      handleClick(event) {
+        // Закрываем детали при клике вне секций
+        if (event.target.tagName === 'svg') {
+          this.activeSection = null;
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>

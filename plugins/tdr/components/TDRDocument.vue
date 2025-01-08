@@ -2,28 +2,25 @@
   <div class="tdr-document">
     <div v-if="error" class="error">
       {{ error }}
-      <div class="debug-info" v-if="debugInfo">
+      <div v-if="debugInfo" class="debug-info">
         <pre>{{ debugInfo }}</pre>
       </div>
     </div>
     <div v-else-if="model" class="tdr-model">
       <div class="view-switcher">
         <button 
-          :class="['view-button', { active: currentView === 'list' }]" 
-          @click="currentView = 'list'"
-        >
+          v-bind:class="['view-button', { active: currentView === 'list' }]" 
+          v-on:click="currentView = 'list'">
           Список
         </button>
         <button 
-          :class="['view-button', { active: currentView === 'wheel' }]" 
-          @click="currentView = 'wheel'"
-        >
+          v-bind:class="['view-button', { active: currentView === 'wheel' }]" 
+          v-on:click="currentView = 'wheel'">
           Круговая диаграмма
         </button>
         <button 
-          :class="['view-button', { active: currentView === 'hierarchy' }]" 
-          @click="currentView = 'hierarchy'"
-        >
+          v-bind:class="['view-button', { active: currentView === 'hierarchy' }]" 
+          v-on:click="currentView = 'hierarchy'">
           Иерархия
         </button>
       </div>
@@ -32,18 +29,18 @@
       <div v-if="currentView === 'list'" class="list-view">
         <h1>{{ model.description }}</h1>
         
-        <div v-for="(section, sectionKey) in sections" :key="sectionKey" class="tdr-section">
+        <div v-for="(section, sectionKey) in sections" v-bind:key="sectionKey" class="tdr-section">
           <h2>{{ section.title }}</h2>
           <p class="description">{{ section.description }}</p>
           
           <template v-for="(subsection, subsectionKey) in section.subsections">
-            <div v-if="subsectionKey !== 'description'" :key="subsectionKey" class="tdr-subsection">
+            <div v-if="subsectionKey !== 'description'" v-bind:key="subsectionKey" class="tdr-subsection">
               <h3>{{ subsectionKey }}</h3>
               <p v-if="typeof subsection === 'object' && subsection.description">{{ subsection.description }}</p>
               
               <div v-if="subsection.items" class="items-list">
                 <ul>
-                  <li v-for="(item, index) in subsection.items" :key="index">
+                  <li v-for="(item, index) in subsection.items" v-bind:key="index">
                     {{ item }}
                   </li>
                 </ul>
@@ -56,146 +53,144 @@
       <!-- Круговая диаграмма -->
       <div v-else-if="currentView === 'wheel'" class="wheel-view">
         <process-wheel 
-          :sections="sections"
-          :title="model.description"
-        />
+          v-bind:sections="sections"
+          v-bind:title="model.description" />
       </div>
 
       <!-- Иерархическая диаграмма -->
       <div v-else class="hierarchy-view">
         <tdr-hierarchy
-          :sections="sections"
-        />
+          v-bind:sections="sections" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import ProcessWheel from './ProcessWheel.vue';
-import TDRHierarchy from './TDRHierarchy.vue';
+  import ProcessWheel from './ProcessWheel.vue';
+  import TDRHierarchy from './TDRHierarchy.vue';
 
-export default {
-  name: 'TDRDocument',
-  components: {
-    ProcessWheel,
-    'tdr-hierarchy': TDRHierarchy
-  },
-  props: {
-    profile: {
-      type: Object,
-      required: true
+  export default {
+    name: 'TDRDocument',
+    components: {
+      ProcessWheel,
+      'tdr-hierarchy': TDRHierarchy
     },
-    pullData: {
-      type: Function,
-      required: true
-    },
-    getContent: {
-      type: Function,
-      required: true
-    }
-  },
-  data() {
-    return {
-      model: null,
-      error: null,
-      sections: null,
-      debugInfo: null,
-      currentView: 'wheel' // По умолчанию показываем диаграмму
-    };
-  },
-  watch: {
-    profile: {
-      handler: 'loadData',
-      immediate: true,
-      deep: true
-    }
-  },
-  methods: {
-    async loadData() {
-      try {
-        // Отладочная информация
-        console.log('TDR Plugin: Component mounted');
-        console.log('TDR Plugin: Profile keys:', Object.keys(this.profile));
-        console.log('TDR Plugin: Profile values:', Object.values(this.profile));
-        
-        // Проверяем наличие source в profile
-        const source = this.profile.source || (this.profile.$base && this.profile.$base.source);
-        
-        if (!source) {
-          this.debugInfo = JSON.stringify({
-            profile: this.profile,
-            profileKeys: Object.keys(this.profile),
-            profileBase: this.profile.$base
-          }, null, 2);
-          throw new Error('Не указан путь к файлу модели (source) в конфигурации');
-        }
-
-        console.log('TDR Plugin: Using source:', source);
-
-        // Получаем данные через pullData
-        const data = await this.pullData();
-        console.log('TDR Plugin: Pulled data:', data);
-
-        if (!data) {
-          throw new Error('pullData вернул пустые данные');
-        }
-
-        if (!data['ceaf.tdr.model']) {
-          console.error('TDR Plugin: Missing ceaf.tdr.model in data:', data);
-          throw new Error('В данных отсутствует секция ceaf.tdr.model');
-        }
-
-        this.model = data['ceaf.tdr.model'];
-        this.processModel();
-      } catch (err) {
-        const errorMessage = `Ошибка загрузки модели TDR: ${err.message}`;
-        this.error = errorMessage;
-        console.error('TDR Plugin Error:', {
-          message: err.message,
-          profile: this.profile,
-          error: err,
-          stack: err.stack
-        });
+    props: {
+      profile: {
+        type: Object,
+        required: true
+      },
+      pullData: {
+        type: Function,
+        required: true
+      },
+      getContent: {
+        type: Function,
+        required: true
       }
     },
-    processModel() {
-      if (!this.model) return;
-      
-      console.log('TDR Plugin: Processing model:', this.model);
-      
-      const sectionMap = {
-        motivation: 'Мотивация',
-        context: 'Контекст',
-        expected_result: 'Ожидаемый результат',
-        architectural_solution: 'Архитектурное решение',
-        implementation: 'Реализация',
-        reflection: 'Рефлексия',
-        knowledge_accumulation: 'Накопление знаний'
+    data() {
+      return {
+        model: null,
+        error: null,
+        sections: null,
+        debugInfo: null,
+        currentView: 'wheel' // По умолчанию показываем диаграмму
       };
+    },
+    watch: {
+      profile: {
+        handler: 'loadData',
+        immediate: true,
+        deep: true
+      }
+    },
+    methods: {
+      async loadData() {
+        try {
+          // Отладочная информация
+          console.log('TDR Plugin: Component mounted');
+          console.log('TDR Plugin: Profile keys:', Object.keys(this.profile));
+          console.log('TDR Plugin: Profile values:', Object.values(this.profile));
+        
+          // Проверяем наличие source в profile
+          const source = this.profile.source || (this.profile.$base && this.profile.$base.source);
+        
+          if (!source) {
+            this.debugInfo = JSON.stringify({
+              profile: this.profile,
+              profileKeys: Object.keys(this.profile),
+              profileBase: this.profile.$base
+            }, null, 2);
+            throw new Error('Не указан путь к файлу модели (source) в конфигурации');
+          }
 
-      this.sections = {};
-      
-      Object.entries(sectionMap).forEach(([key, title]) => {
-        if (this.model[key]) {
-          const section = this.model[key];
-          const subsections = { ...section };
-          delete subsections.description;
+          console.log('TDR Plugin: Using source:', source);
 
-          this.sections[key] = {
-            title,
-            description: section.description || '',
-            subsections
-          };
+          // Получаем данные через pullData
+          const data = await this.pullData();
+          console.log('TDR Plugin: Pulled data:', data);
+
+          if (!data) {
+            throw new Error('pullData вернул пустые данные');
+          }
+
+          if (!data['ceaf.tdr.model']) {
+            console.error('TDR Plugin: Missing ceaf.tdr.model in data:', data);
+            throw new Error('В данных отсутствует секция ceaf.tdr.model');
+          }
+
+          this.model = data['ceaf.tdr.model'];
+          this.processModel();
+        } catch (err) {
+          const errorMessage = `Ошибка загрузки модели TDR: ${err.message}`;
+          this.error = errorMessage;
+          console.error('TDR Plugin Error:', {
+            message: err.message,
+            profile: this.profile,
+            error: err,
+            stack: err.stack
+          });
         }
-      });
+      },
+      processModel() {
+        if (!this.model) return;
       
-      console.log('TDR Plugin: Processed sections:', this.sections);
-      console.log('TDR Plugin: Current view:', this.currentView);
-      console.log('TDR Plugin: Sections structure:', JSON.stringify(this.sections, null, 2));
+        console.log('TDR Plugin: Processing model:', this.model);
+      
+        const sectionMap = {
+          motivation: 'Мотивация',
+          context: 'Контекст',
+          expected_result: 'Ожидаемый результат',
+          architectural_solution: 'Архитектурное решение',
+          implementation: 'Реализация',
+          reflection: 'Рефлексия',
+          knowledge_accumulation: 'Накопление знаний'
+        };
+
+        this.sections = {};
+      
+        Object.entries(sectionMap).forEach(([key, title]) => {
+          if (this.model[key]) {
+            const section = this.model[key];
+            const subsections = { ...section };
+            delete subsections.description;
+
+            this.sections[key] = {
+              title,
+              description: section.description || '',
+              subsections
+            };
+          }
+        });
+      
+        console.log('TDR Plugin: Processed sections:', this.sections);
+        console.log('TDR Plugin: Current view:', this.currentView);
+        console.log('TDR Plugin: Sections structure:', JSON.stringify(this.sections, null, 2));
+      }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
