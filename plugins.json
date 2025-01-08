@@ -1,12 +1,12 @@
 {
     "inbuilt": [
-        "plugins/example",
         "plugins/html",
         "plugins/markaper",
         "plugins/charts",
         "plugins/devtool",
         "plugins/svg",
         "plugins/bpmnjs",
-        "plugins/drawio"
+        "plugins/drawio",
+        "plugins/tdr"
     ]
 }
