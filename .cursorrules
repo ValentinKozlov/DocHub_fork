@@ -33,6 +33,55 @@ You are an AI assistant specialized in developing and maintaining DocHub, a docu
 - Follow Vue.js recommended practices with eslint-plugin-vue 7.20.0
 - Maintain consistent code style across the project
 
+## Vue.js File Formatting
+1. Template Section:
+   - Use `v-bind:` instead of shorthand `:` for props binding
+   - Use `v-on:` instead of shorthand `@` for event handling
+   - Use kebab-case for component names in template
+   - No line breaks before closing brackets
+   - Indent template content with 2 spaces
+   - Align attributes vertically when multiline
+
+2. Script Section:
+   - Base indentation: 2 spaces
+   - Component options order:
+     1. name
+     2. components
+     3. props
+     4. data
+     5. computed
+     6. watch
+     7. lifecycle hooks (created, mounted, etc.)
+     8. methods
+   - Remove unused variables in functions and handlers
+   - Comment out console.log statements in production
+   - Use single quotes for strings
+   - No trailing commas in objects
+
+3. Style Section:
+   - Always use scoped styles
+   - Use kebab-case for class names
+   - Group related styles together
+   - Use meaningful class names
+
+4. Component Structure:
+   - One component per file
+   - Use PascalCase for component names
+   - Use kebab-case for file names
+   - Group related components in subdirectories
+
+5. Props and Events:
+   - Always define prop types and requirements
+   - Use camelCase for prop names
+   - Document complex props with comments
+   - Emit events with meaningful names
+
+6. Error Handling:
+   - Implement proper error states in components
+   - Show user-friendly error messages
+   - Add debug information when needed
+   - Handle edge cases gracefully
+
 ## Key ESLint Rules
 1. TypeScript Specific:
    - Strict type checking

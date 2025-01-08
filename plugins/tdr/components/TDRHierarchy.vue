@@ -292,32 +292,32 @@
     },
     watch: {
       sections: {
-        handler(newSections) {
-          console.log('TDRHierarchy: Sections updated:', newSections);
+        handler() {
+          // console.log('TDRHierarchy: Sections updated:', newSections);
         },
         deep: true
       },
-      activeSection(newSection) {
-        console.log('TDRHierarchy: Active section changed:', newSection);
+      activeSection() {
+        // console.log('TDRHierarchy: Active section changed:', newSection);
       }
     },
     created() {
-      console.log('TDRHierarchy: Component created');
-      console.log('TDRHierarchy: Received sections:', this.sections);
-      console.log(
-        'TDRHierarchy: Sections structure:',
-        JSON.stringify(this.sections, null, 2)
-      );
+      // console.log('TDRHierarchy: Component created');
+      // console.log('TDRHierarchy: Received sections:', this.sections);
+      // console.log(
+      //   'TDRHierarchy: Sections structure:',
+      //   JSON.stringify(this.sections, null, 2)
+      // );
     },
     mounted() {
-      console.log('TDRHierarchy: Component mounted');
+      // console.log('TDRHierarchy: Component mounted');
       if (!this.sections) {
-        console.warn('TDRHierarchy: No sections data provided');
+        // console.warn('TDRHierarchy: No sections data provided');
       } else {
-        console.log(
-          'TDRHierarchy: Available sections:',
-          Object.keys(this.sections)
-        );
+        // console.log(
+        //   'TDRHierarchy: Available sections:',
+        //   Object.keys(this.sections)
+        // );
       }
     },
     methods: {

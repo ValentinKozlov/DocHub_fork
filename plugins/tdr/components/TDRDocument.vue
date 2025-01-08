@@ -110,9 +110,9 @@
       async loadData() {
         try {
           // Отладочная информация
-          console.log('TDR Plugin: Component mounted');
-          console.log('TDR Plugin: Profile keys:', Object.keys(this.profile));
-          console.log('TDR Plugin: Profile values:', Object.values(this.profile));
+          // console.log('TDR Plugin: Component mounted');
+          // console.log('TDR Plugin: Profile keys:', Object.keys(this.profile));
+          // console.log('TDR Plugin: Profile values:', Object.values(this.profile));
         
           // Проверяем наличие source в profile
           const source = this.profile.source || (this.profile.$base && this.profile.$base.source);
@@ -126,18 +126,18 @@
             throw new Error('Не указан путь к файлу модели (source) в конфигурации');
           }
 
-          console.log('TDR Plugin: Using source:', source);
+          // console.log('TDR Plugin: Using source:', source);
 
           // Получаем данные через pullData
           const data = await this.pullData();
-          console.log('TDR Plugin: Pulled data:', data);
+          // console.log('TDR Plugin: Pulled data:', data);
 
           if (!data) {
             throw new Error('pullData вернул пустые данные');
           }
 
           if (!data['ceaf.tdr.model']) {
-            console.error('TDR Plugin: Missing ceaf.tdr.model in data:', data);
+            // console.error('TDR Plugin: Missing ceaf.tdr.model in data:', data);
             throw new Error('В данных отсутствует секция ceaf.tdr.model');
           }
 
@@ -146,18 +146,18 @@
         } catch (err) {
           const errorMessage = `Ошибка загрузки модели TDR: ${err.message}`;
           this.error = errorMessage;
-          console.error('TDR Plugin Error:', {
-            message: err.message,
-            profile: this.profile,
-            error: err,
-            stack: err.stack
-          });
+          // console.error('TDR Plugin Error:', {
+          //   message: err.message,
+          //   profile: this.profile,
+          //   error: err,
+          //   stack: err.stack
+          // });
         }
       },
       processModel() {
         if (!this.model) return;
       
-        console.log('TDR Plugin: Processing model:', this.model);
+        // console.log('TDR Plugin: Processing model:', this.model);
       
         const sectionMap = {
           motivation: 'Мотивация',
@@ -185,9 +185,9 @@
           }
         });
       
-        console.log('TDR Plugin: Processed sections:', this.sections);
-        console.log('TDR Plugin: Current view:', this.currentView);
-        console.log('TDR Plugin: Sections structure:', JSON.stringify(this.sections, null, 2));
+        // console.log('TDR Plugin: Processed sections:', this.sections);
+        // console.log('TDR Plugin: Current view:', this.currentView);
+        // console.log('TDR Plugin: Sections structure:', JSON.stringify(this.sections, null, 2));
       }
     }
   };

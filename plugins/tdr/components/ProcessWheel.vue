@@ -19,7 +19,7 @@
       </text>
 
       <!-- Секции -->
-      <g v-for="(section, index) in processedSections" v-bind:key="section.key">
+      <g v-for="section in processedSections" v-bind:key="section.key">
         <!-- Сектор -->
         <path
           v-bind:d="section.path"
@@ -51,11 +51,10 @@
       <p class="description">{{ sections[activeSection].description }}</p>
       
       <div
-        v-for="(subsection, key) in sections[activeSection].subsections" 
-        v-if="key !== 'description'" 
-        v-bind:key="key"
+        v-for="subsection in activeSubsections" 
+        v-bind:key="subsection.key"
         class="subsection">
-        <h4>{{ key }}</h4>
+        <h4>{{ subsection.key }}</h4>
         <p v-if="subsection.description">{{ subsection.description }}</p>
         <ul v-if="subsection.items">
           <li v-for="(item, i) in subsection.items" v-bind:key="i">{{ item }}</li>
@@ -135,13 +134,14 @@
           top: `${this.detailsPosition.y}px`
         };
       },
-      filteredItems() {
-        if (!this.sections[this.activeSection]?.subsections) return [];
+      activeSubsections() {
+        if (!this.activeSection || !this.sections[this.activeSection]) return [];
         return Object.entries(this.sections[this.activeSection].subsections)
           .filter(([key]) => key !== 'description')
           .map(([key, value]) => ({
             key,
-            ...value
+            description: value.description,
+            items: value.items
           }));
       }
     },
