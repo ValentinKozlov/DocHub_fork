@@ -186,11 +186,9 @@
         window.$PAPI.goto(null, entity, id);
       },
       loginout() {
-        this.user ? oidcClient.logout() : oidcClient.login();
-        console.log('login/logout');
+        this.user ? oidcClient.logout() : oidcClient.login();        
         this.user ? oidcClient.logout() : oidcClient.login().then(() => {
-          window.Vuex.dispatch('setRolesFromToken');
-          console.log('call set roles from token');
+          window.Vuex.dispatch('setRolesFromToken');          
         });
       }
     }
