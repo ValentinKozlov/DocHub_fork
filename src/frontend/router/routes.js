@@ -74,7 +74,7 @@ const middleware = (route) => {
 };
 
 const login = async function() {
-  console.log('window.Vuex',window.Vuex);
+  // console.log('window.Vuex',window.Vuex);
   await oidcClient.signinCallback();
 };
 

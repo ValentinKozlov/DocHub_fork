@@ -364,7 +364,7 @@ export default {
 		},
     //парсим токен с ролями
     setRolesFromToken(context){
-      console.log('ACTION.............');
+    //   console.log('ACTION.............');
       context.commit('setAvailableRoles', {roles : {users: ['test']}});
 
     },
@@ -415,7 +415,7 @@ export default {
 
 		// Reload root manifest
 		async reloadRootManifest(_context, payload) {
-      console.log('reload root manifest');
+    //   console.log('reload root manifest');
 			// Если работаем в режиме backend, берем все оттуда
 			if (env.isBackendMode()) {
 				storageManager.onStartReload();
