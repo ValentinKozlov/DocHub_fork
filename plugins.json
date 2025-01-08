@@ -6,7 +6,6 @@
         "plugins/devtool",
         "plugins/svg",
         "plugins/bpmnjs",
-        "plugins/drawio",
-        "plugins/tdr"
+        "plugins/drawio"
     ]
 }
