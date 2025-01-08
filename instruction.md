@@ -334,3 +334,153 @@ console.log('Plugin: Data:', data);
    - Комментируйте сложные участки кода
    - Следуйте принципам SOLID
    - Поддерживайте единый стиль кода во всем плагине
+
+## Форматирование кода
+
+### Порядок действий при форматировании Vue компонентов
+
+1. Перед внесением изменений в код проверить правила форматирования в `.eslintrc.js`
+2. Обратить особое внимание на следующие правила:
+   - `vue/script-indent`: базовый отступ и отступы для вложенных элементов
+   - `vue/html-indent`: правила отступов для template
+   - `vue/v-bind-style`: использование полной формы v-bind
+   - `vue/v-on-style`: использование полной формы v-on
+   - Правила форматирования атрибутов и их выравнивания
+
+3. Учитывать специальные правила отступов:
+   - Базовый отступ (baseIndent) для разных секций компонента
+   - Отступы для атрибутов (attribute)
+   - Правила закрытия скобок (closeBracket)
+   - Вертикальное выравнивание атрибутов (alignAttributesVertically)
+
+4. Проверить дополнительные правила Vue:
+   - Именование компонентов (component-name-in-template-casing)
+   - Максимальное количество атрибутов на строку (max-attributes-per-line)
+   - Правила переноса строк (html-closing-bracket-newline)
+
+### Пример правильного форматирования
+
+```vue
+<template>
+  <div v-bind:class="'container'">
+    <component-name
+      v-bind:prop1="value1"
+      v-bind:prop2="value2"
+      v-on:event="handler">
+      Content
+    </component-name>
+  </div>
+</template>
+
+<script>
+  import Component from './Component.vue';
+
+  export default {
+    name: 'ComponentName',
+    
+    components: {
+      Component
+    },
+    
+    data() {
+      return {
+        value: ''
+      };
+    }
+  };
+</script>
+```
+
+### Проверка форматирования
+
+1. Запустить проверку ESLint:
+   ```bash
+   npm run lint
+   ```
+
+2. Исправить ошибки форматирования:
+   ```bash
+   npm run lint -- --fix
+   ```
+
+3. Проверить, что все ошибки исправлены и код соответствует стандартам проекта
+
+## Именование компонентов
+
+### Правила именования
+1. **В шаблонах (template)**: 
+   - Использовать kebab-case
+   - Пример: `<tdr-mermaid-diagram />`
+   - Правило ESLint: `vue/component-name-in-template-casing`
+
+2. **При регистрации компонентов**:
+   - Использовать PascalCase для имени компонента
+   - Использовать PascalCase для импортируемого компонента
+   ```javascript
+   import TDRMermaidDiagram from './components/TDRMermaidDiagram.vue';
+   
+   export default {
+     install(Vue) {
+       Vue.component('TdrMermaidDiagram', TDRMermaidDiagram);
+     }
+   };
+   ```
+
+3. **Имена файлов компонентов**:
+   - Использовать PascalCase
+   - Пример: `TDRMermaidDiagram.vue`
+
+### Пример правильного использования
+```vue
+<!-- В template (kebab-case) -->
+<template>
+  <div class="container">
+    <tdr-mermaid-diagram />
+    <custom-component />
+  </div>
+</template>
+
+<!-- В script (PascalCase) -->
+<script>
+import TDRMermaidDiagram from './TDRMermaidDiagram.vue';
+import CustomComponent from './CustomComponent.vue';
+
+export default {
+  name: 'ParentComponent',
+  components: {
+    TdrMermaidDiagram,
+    CustomComponent
+  }
+};
+</script>
+```
+
+### Проверка именования
+1. ESLint проверит правильность именования с помощью правил:
+   - `vue/component-name-in-template-casing` (требует kebab-case в шаблонах)
+   - `vue/component-definition-name-casing` (требует PascalCase при регистрации)
+
+2. Типичные ошибки и их исправление:
+   ```javascript
+   // Неправильно
+   Vue.component('tdr-mermaid-diagram', TDRMermaidDiagram);  // kebab-case не допускается при регистрации
+   <TdrMermaidDiagram />  // PascalCase не допускается в шаблоне
+   components: {
+     'tdr-mermaid': TDRMermaidDiagram  // Имя компонента не соответствует использованию в шаблоне
+   }
+
+   // Правильно
+   Vue.component('TdrMermaidDiagram', TDRMermaidDiagram);  // PascalCase при регистрации
+   <tdr-mermaid-diagram />  // kebab-case в шаблоне
+   components: {
+     'tdr-mermaid-diagram': TDRMermaidDiagram  // Имя соответствует использованию в шаблоне
+   }
+   ```
+
+### Важные замечания
+1. Имя компонента при регистрации должно точно соответствовать тому, как он используется в шаблоне
+2. ESLint предупредит о компонентах, которые зарегистрированы, но не используются
+3. При изменении имени компонента нужно обновить его везде:
+   - В импорте (PascalCase)
+   - В регистрации компонента (kebab-case в локальной регистрации)
+   - В шаблоне (kebab-case)

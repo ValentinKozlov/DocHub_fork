@@ -23,6 +23,16 @@
           v-on:click="currentView = 'hierarchy'">
           Иерархия
         </button>
+        <button 
+          v-bind:class="['view-button', { active: currentView === 'mermaid' }]" 
+          v-on:click="currentView = 'mermaid'">
+          Mermaid диаграмма
+        </button>
+        <button 
+          v-bind:class="['view-button', { active: currentView === 'flow' }]" 
+          v-on:click="currentView = 'flow'">
+          Flow диаграмма
+        </button>
       </div>
 
       <!-- Список -->
@@ -58,9 +68,19 @@
       </div>
 
       <!-- Иерархическая диаграмма -->
-      <div v-else class="hierarchy-view">
+      <div v-else-if="currentView === 'hierarchy'" class="hierarchy-view">
         <tdr-hierarchy
           v-bind:sections="sections" />
+      </div>
+
+      <!-- Добавляем новый view -->
+      <div v-else-if="currentView === 'mermaid'" class="mermaid-view">
+        <tdr-mermaid-diagram />
+      </div>
+
+      <!-- Добавляем Flow диаграмму -->
+      <div v-else-if="currentView === 'flow'" class="flow-view">
+        <tdr-flow-diagram v-bind:sections="sections" />
       </div>
     </div>
   </div>
@@ -69,12 +89,16 @@
 <script>
   import ProcessWheel from './ProcessWheel.vue';
   import TDRHierarchy from './TDRHierarchy.vue';
+  import TDRMermaidDiagram from './TDRMermaidDiagram.vue';
+  import TDRFlowDiagram from './TDRFlowDiagram.vue';
 
   export default {
     name: 'TDRDocument',
     components: {
       ProcessWheel,
-      'tdr-hierarchy': TDRHierarchy
+      'tdr-hierarchy': TDRHierarchy,
+      'tdr-mermaid-diagram': TDRMermaidDiagram,
+      'tdr-flow-diagram': TDRFlowDiagram
     },
     props: {
       profile: {
@@ -294,5 +318,21 @@
   justify-content: center;
   align-items: center;
   min-height: 800px;
+}
+
+.hierarchy-view {
+  margin: 20px auto;
+  max-width: 1000px;
+}
+
+.mermaid-view {
+  margin: 20px auto;
+  max-width: 1000px;
+}
+
+.flow-view {
+  margin: 20px auto;
+  max-width: 1200px;
+  height: 800px;
 }
 </style> 
