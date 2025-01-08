@@ -5,12 +5,12 @@ node_modules
 /vscode-dist
 /certs
 /gitlab
-/plugins
+# /plugins
 /src/hidden
 /cache
 /public/temp
 
-./plugins.json
+# ./plugins.json
 
 /public/workspace/*
 
